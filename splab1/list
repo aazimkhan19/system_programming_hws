@@ -1,0 +1,129 @@
+contain:
+	grep letter filename
+or:
+	grep -E 'letter1|letter2' filename
+	grep -G 'letter1\|letter2' filename
+zero or more:
+	grep -E 'letter*' filename
+one or more:
+	grep -E 'letter+' filename
+ends with:
+	grep letter$ filename
+starts with:
+	grep ^letter filename
+separate word:
+	grep 'letter\b' filename
+	grep -w letter filename
+rename file(first match):
+	rename 's/TXT/text/' *
+	rename 's/text/txt/' *.text
+	sudo apt install rename
+global replace:
+	rename -n 's/TXT/txt/g' aTXT.TXT
+case insensitive replace:
+	rename 's/.text/.txt/i' *
+renaming extensions:
+		rename 's/.txt$/.TXT' *.txt
+stream editor - replace:
+	echo Sunday | sed 's/Sun/Mon/'
+	echo Sunday | sed 's:Sun:Mon:'
+	echo Sunday | sed 's_Sun_Mon_'
+	echo Sunday | sed 's|Sun|Mun|
+interactive editor
+	echo Sunday > today
+	cat today
+		Sunday
+	sed -i 's/Sun/Mon/' today
+	cat today
+		Monday
+simple back referencing - double the word:
+	echo Sunday | sed 's/Sun/&&/'
+		SunSunday
+	echo Sunday | sed 's/day/&&/'
+		Sundayday
+back referencing:
+	echo Sunday | sed 's_\(Sun\)_\1ny_'
+		Sunnyday
+	echo Sunday | sed 's_\(Sun\)_\1ny \1_'
+		Sunny Sunday
+a dot for any character:
+	echo 2014-04-01 | sed 's/....-..-../YYYY-MM-DD/'
+		YYYY-MM-DD
+	echo abcd-ef-gh | sed 's/....-..-../YYYY-MM-DD/'
+		YYYY-MM-DD
+multiple back referencing:
+	echo 2014-04-01 | sed 's/\(....\)-\(..\)-\(..\)/\1+\2+\3/'
+		2014+04+01
+	echo 2014-04-01 | sed 's/\(....\)-\(..\)-\(..\)/\3:\2:\1/'
+		01:04:2014
+white space - \s is space or tab: 
+	echo -e 'today\tis\twarm' | sed 's_\s_ _g'
+		today is warm
+optional occurence:
+	cat list2
+		ll
+		lol
+		lool
+		loool
+	grep -E 'ooo?' list2
+		lool
+		loool
+	cat list2 | sed 's/ooo\?/A/'
+		ll
+		lol
+		lAl
+		lAl
+exactly n times:
+	cat list2
+		ll
+		lol
+		lool
+		loool
+	grep -E 'o{3}' list2
+		loool
+	cat list2 | sed 's/o\{3\}/A/'
+		ll
+		lol
+		lool
+		lAl
+between n and m times:
+	cat list2
+		ll
+		lol
+		lool
+		loool
+	grep -E 'o{2,3}' list2
+		lool
+		loool
+	grep 'o\{2,3\}' list2
+		lool
+		loool
+	cat list2 | sed 's/o\{2,3\}/A/'
+		ll
+		lol
+		lAl
+		lAl
+
+
+grep -o -i '01/Oct/2006' log.txt | wc -l
+
+grep -o -E [0-9][0-9]/Oct/2006 log.txt | sort -u
+grep -o -E [0-9][0-9]/Oct/2006 log.txt
+grep -o -E [0-1][0-4]/Oct/2006 log.txt | sort -u -f | wc -l
+
+grep '\[18/Oct/2006' log.txt | sed -E 's/^(.*) - - \[.*\] ".*" [0-9][0-9]* [-0-9][0-9]* (".*") ".*"$/\2/' | grep -v+ '"-"' | sed 's/^"//' | sed 's/"$//' | sort | uniq -c | sort -n | tail -10 | tac
+
+grep -E [0-9][0-9]/[A-Z]{1}[a-z]{2}/[0-9]{4} log.txt | sed 's/.*\(..\)\/Oct\/\(....\).*/\2-10-\1/' | sort | uniq -c | sort -ru | head -10 | sed 's/\(...\)\s\(....\)-\(..\)-\(..\)/\2-\3-\4 - \1 - /' | nl -s.
+
+grep -E [0-9][0-9]/[A-Z]{1}[a-z]{2}/[0-9]{4} log.txt | sed 's/.*\(..\)\/Oct\/\(....\).*/\2-10-\1/' | sort | uniq -c | sort -ru | head -10 | \
+while read -r count date; do
+   printf "%f %d %s\n"  "$(( 10**9 * count / 10000 ))E-9" "$count" "$date"
+done
+
+grep -E [0-9][0-9]/[A-Z]{1}[a-z]{2}/[0-9]{4} log.txt | sed 's/.*\(..\)\/Oct\/\(....\).*/\2-10-\1/' | sort | uniq -c | sort -ru | head -10 |  while read -r count date; do     printf "%s - %d - $(echo "scale=2; 100*$count/10000"|bc)%%\n" "$date" "$count";  done | nl -s'. '
+
+grep -E [0-9][0-9]/[A-Z]{1}[a-z]{2}/[0-9]{4} log.txt | cut -d' -f1 | sort | uniq -c | sort -rn | head -10 | tr -s ' ' | cut -d' ' -f2,3 | sed -E 's/(\S*) (\S*)/\2 - \1/' | nl -s'. '
+
+grep -o ../Oct/.... log.txt | sed 's/\(..\)\/Oct\/\(....\)/\2-10-\1/' | sort | uniq -c | sort -ru | head
+
+

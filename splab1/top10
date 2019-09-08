@@ -1,0 +1,12 @@
+#!/bin/bash
+
+totaldate=0
+for i in `grep -o ../Oct/.... $1 | sed 's/\(..\)\/Oct\/\(....\)/\2-10-\1/' | sort | uniq -c | sort -ru | head | tr -s ' ' | cut -d' ' -f2`; do
+     totaldate=$((totaldate + $i))
+done
+
+index=1
+while read count date; do
+	printf "$index. $date - $count - $(echo "scale=2; $count * 100 / $totaldate" | bc)%%\n"		
+	index=$((index + 1))
+done < <(grep -o ../Oct/.... $1 | sed 's/\(..\)\/Oct\/\(....\)/\2-10-\1/' | sort | uniq -c | sort -ru | head | tr -s ' ' | cut -d' ' -f2,3)

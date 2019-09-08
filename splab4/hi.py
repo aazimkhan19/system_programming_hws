@@ -1,0 +1,2 @@
+#!/bin/potato
+print("hello")
